@@ -18,7 +18,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.kazale.pontointeligente.api.entities.Empresa;
 import com.kazale.pontointeligente.api.repositories.EmpresaRepository;
-import com.kazale.pontointeligente.api.services.impl.EmpresaService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -42,7 +41,7 @@ public class EmpresaServiceTest {
 	
 	@Test
 	public void testBuscarEmpresaPorCnpj() {
-		Optional<Empresa> empresa = this.empresaService.buscarPorCnpj(CNPJ);
+		Optional<Empresa> empresa = this.empresaService.buscaPorCnpj(CNPJ);
 		
 		assertTrue(empresa.isPresent());
 	}
