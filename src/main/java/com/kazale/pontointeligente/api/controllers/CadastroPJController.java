@@ -19,9 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.kazale.pontointeligente.api.dtos.CadastroPJDto;
 import com.kazale.pontointeligente.api.entities.Empresa;
 import com.kazale.pontointeligente.api.entities.Funcionario;
+import com.kazale.pontointeligente.api.enums.PerfilEnum;
 import com.kazale.pontointeligente.api.response.Response;
 import com.kazale.pontointeligente.api.services.EmpresaService;
 import com.kazale.pontointeligente.api.services.FuncionarioService;
+import com.kazale.pontointeligente.api.utils.PasswordUtils;
 
 @RestController
 @RequestMapping("/api/cadastrar-pj")
@@ -50,7 +52,7 @@ public class CadastroPJController {
 			
 			validarDadosExistentes(cadastroPJDto, result);
 			
-			Empresa empresa = this.converDtoParaFuncionario(cadastroPJDto, result);
+			Empresa empresa = this.converDtoParaEmpresa(cadastroPJDto);
 			Funcionario funcionario = this.converterDtoParaFuncionario(cadastroPJDto, result);
 			
 			if(result.hasErrors()) {
@@ -70,6 +72,41 @@ public class CadastroPJController {
 		}
 
 		
+		private CadastroPJDto converterCadastroPJDto(Funcionario funcionario) {
+			CadastroPJDto cadastroPJDto = new CadastroPJDto();
+			cadastroPJDto.setId(funcionario.getId());
+			cadastroPJDto.setNome(funcionario.getNome());
+			cadastroPJDto.setEmail(funcionario.getEmail());
+			cadastroPJDto.setCpf(funcionario.getCpf());
+			cadastroPJDto.setRazaoSocial(funcionario.getEmpresa().getRazaoSocial());
+			cadastroPJDto.setCnpj(funcionario.getEmpresa().getCnpj());
+			
+ 			return cadastroPJDto;
+		}
+
+
+		private Funcionario converterDtoParaFuncionario(CadastroPJDto cadastroPJDto, BindingResult result) 
+				throws NoSuchAlgorithmException {
+			Funcionario funcionario = new Funcionario();
+			funcionario.setNome(cadastroPJDto.getNome());
+			funcionario.setEmail(cadastroPJDto.getEmail());
+			funcionario.setCpf(cadastroPJDto.getCpf());
+			funcionario.setPerfil(PerfilEnum.ROLE_ADMIN);
+			funcionario.setSenha(PasswordUtils.gerarBCrypt(cadastroPJDto.getSenha()));
+			
+			return funcionario;
+		}
+
+
+		private Empresa converDtoParaEmpresa(CadastroPJDto cadastroPJDto) {
+			Empresa empresa = new Empresa();
+			empresa.setCnpj(cadastroPJDto.getCnpj());
+			empresa.setRazaoSocial(cadastroPJDto.getRazaoSocial());
+			
+			return empresa;
+		}
+
+
 		/**
 		 * Verifica se a empresa ou funcionário já existem na base de dados.
 		 * @param cadastroPJDto
